@@ -2,26 +2,26 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:practice/google_button.dart';
 import 'package:practice/my_button.dart';
 import 'package:practice/services/auth_services.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   final Function()? onTap;
-  const LoginPage({super.key, this.onTap});
+  const RegisterPage({super.key, this.onTap});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final emailnamecontroler = TextEditingController();
 
   final passwordcontroler = TextEditingController();
+  final confirmpasswordcontroler = TextEditingController();
 
-//signuserin method
-  void signUserIn() async {
+//signuserup method
+  void signUserup() async {
     //to show loading circle
     showDialog(
         context: context,
@@ -37,9 +37,17 @@ class _LoginPageState extends State<LoginPage> {
       //when press the sign in button without any input
       showErrorMessage('INPUT EMAIL & PASSWORD');
     } else {
+      // try creating user
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: emailnamecontroler.text, password: passwordcontroler.text);
+        //check if password is confirmed
+        if (passwordcontroler.text == confirmpasswordcontroler.text) {
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+              email: emailnamecontroler.text, password: passwordcontroler.text);
+        } else {
+          // show error message if password doest match
+          showErrorMessage("Password don't match");
+        }
+        //pop the loading circle
         Navigator.pop(context);
       }
       // catch error
@@ -56,27 +64,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     }
-  }
-
-//sign in with google
-  signInWithGoogle() async {
-    // begin interactive sign in process
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-
-    // user cancels google sign in pop up screen
-    if (gUser == null) return;
-
-    // obtain auth details from request
-    final GoogleSignInAuthentication gAuth = await gUser.authentication;
-
-    // create a new credential  for user
-    final credential = GoogleAuthProvider.credential(
-      accessToken: gAuth.accessToken,
-      idToken: gAuth.idToken,
-    );
-
-    // final sign in
-    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   // Function to show error message
@@ -115,15 +102,16 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 //logo
                 Container(
-                  padding: EdgeInsets.all(10),
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     color: Colors.grey[400],
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Image.asset(
-                      'images/logo.png',
-                      height: 70,
+                  child: const Center(
+                    child: Icon(
+                      Icons.person,
+                      size: 70,
                     ),
                   ),
                 ),
@@ -132,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 // welcome back
                 Text(
-                  'welcome back !',
+                  'Create an account !',
                   style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 22,
@@ -174,27 +162,30 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 SizedBox(
-                  height: 8,
+                  height: 15,
                 ),
-                //forgotpassword
+                // confirm password
+                TextField(
+                  controller: confirmpasswordcontroler,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      hintText: 'CONFIRM PASSWORD...',
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey.shade800)),
+                      fillColor: Colors.grey.shade400,
+                      filled: true),
+                ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[800]),
-                    )
-                  ],
-                ),
                 SizedBox(
                   height: 25,
                 ),
 
                 //sign in button
                 MyButton(
-                  text: 'Sign in',
-                  onTap: signUserIn,
+                  text: 'Sign up',
+                  onTap: signUserup,
                 ),
                 SizedBox(
                   height: 30,
@@ -224,9 +215,11 @@ class _LoginPageState extends State<LoginPage> {
                 //google/apple
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [GoogleButton(
-                    onTap: () => AuthServices().signInWithGoogle(),
-                  )],
+                  children: [
+                    GoogleButton(
+                      onTap: () => AuthServices().signInWithGoogle(),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   height: 45,
@@ -234,14 +227,14 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Not a member?'),
+                    Text('Already have an account?'),
                     SizedBox(
                       width: 5,
                     ),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: Text(
-                        'Register now',
+                        'Login now',
                         style: TextStyle(
                             color: Colors.blue, fontWeight: FontWeight.bold),
                       ),

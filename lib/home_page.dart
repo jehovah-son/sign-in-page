@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -14,11 +13,11 @@ final user = FirebaseAuth.instance.currentUser!;
   Widget build(BuildContext context) {
     return  Scaffold(
 appBar: AppBar(
-  backgroundColor: Colors.lightGreenAccent,
-  actions: [IconButton(onPressed: signUserOut, icon: Icon(Icons.logout_rounded))],
+  backgroundColor: Colors.amber,
+  actions: [IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout_rounded))],
 ),
 
-      body: Center(child: Text('logged in as:'  + user.email!),),
+      body: Center(child: Text('logged in as:${user.email!}' ,style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),),
 
     );
   }

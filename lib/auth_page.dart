@@ -1,9 +1,8 @@
-import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:practice/home_page.dart';
-import 'package:practice/login_page.dart';
+import 'package:practice/login_or_register.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -27,7 +26,7 @@ if (snapshot.hasData){
 
         // user not logged in
      else{
-      return LoginPage();
+      return const Loginorregister();
      }
      
      
